@@ -220,7 +220,17 @@ var ics = function(uidDomain, prodId) {
         bb.append(calendar);
         blob = bb.getBlob('text/x-vCalendar;charset=' + document.characterSet);
       }
-      saveAs(blob, filename + ext);
+      const fileUrl = URL.createObjectURL(blob);    
+      const iframe = document.createElement('iframe');
+      iframe.src = fileUrl;
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.style.border = 'none';
+
+      const newWindow = window.open('', '_blank');
+      newWindow.document.body.appendChild(iframe);
+      newWindow.document.title = 'My Custom Title';  // alternatively 'filename.pdf'
+      //saveAs(blob, filename + ext);
       return calendar;
     },
 
