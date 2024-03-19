@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <title>Calculateur</title>
+    <script src="ics.js"></script>
+    <script src="ics.deps.min.js"></script>
+    <script src="hebcal.min.js"></script>
+    <script>
+
+function main() {
+  var lastDate = getLastDateFromCookie();
+  displayLastDate(lastDate);
+}
+
+function readCookie() {
+  return document.cookie.split("; ").filter(x=>x.startsWith("cookie="))[0];
+}
+
+function getLastDateFromCookie() {
+  var cookie = null;
+  var cookieData = readCookie();
+  eval(cookieData);
+  if(cookie == null) return null;
+  var lastDateText = cookie.last;
+  var lastDate = new Date(cookie.last);
+  return lastDate;
+}
+
+function displayLastDate(date) {
+  if(date != null) {
+    document.getElementById('lastDate').innerHTML = date.toLocaleDateString();
+  }
+}
+
+function startNewCycle() {
+  if(!confirm("Démarrer un nouveau cycle aujourd'hui ?")) {
+    return;
+  }
+
+  var newDate = new Date(new Date().toDateString());
+  var lastDate = getLastDateFromCookie();
+
+  if(lastDate == null && confirm("Voulez-vous renseigner la date précédente ?")) {
+    while(lastDate == null || lastDate == "Invalid Date") {
+      var dateText = prompt("Quelle est la date de début du dernier cycle ? (jj/mm/aaaa)").split("/");
+      dateText = [1,0,2].map(x => dateText[x]).join('/');
+      lastDate = new Date(dateText);
+    }
+    alert(lastDate);
+  }
+
+  var dates = computeDates(newDate, lastDate);
+
+  setCalendarReminders(dates);
+
+  setCookie(newDate);
+
+  window.location.href = window.location.href;
+}
+
+function computeDates(newDate, lastDate) {
+  var result = new Set();
+  result.add(computeDate30(newDate));
+  result.add(computeDateFromLast(newDate, lastDate));
+  result.add(computeDateFromMonth(newDate));
+  return [...result].filter(x => x!= null).map(x => new Date(new Date(x).toDateString()));
+}
+
+function setCalendarReminders(dates) {
+  var cal = ics();
+  dates.map(x => cal.addEvent("Pricha", "Pricha", "", x, new Date(addDaysToDate(x, 1).getTime()-1)));
+  cal.download("pricha_" + new Date().toLocaleDateString());
+}
+
+function setCookie(date) {
+  var data = '{"last": "' + date.toDateString() + '"}';
+  setCookieData(data);
+}
+
+function setCookieData(data) {
+  document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
+}
+
+function addDaysToDate(date, days) {
+  return new Date(date.getTime() + days * 864E5);
+}
+
+function computeDate30(date) {
+  return addDaysToDate(date, 30);
+}
+
+function computeDateFromLast(newDate, lastDate) {
+  if(lastDate == null) {
+    alert("Attention: impossible de calculer une des dates sans connaitre le début du cycle précédent");
+    return null;
+  }
+  var nbDaysBetween = Math.round((newDate - lastDate) / 864E5);
+  return addDaysToDate(newDate, nbDaysBetween);
+}
+
+function computeDateFromMonth(date) {
+  var hebDate = Hebcal.HDate(date);
+
+  var daysInMonth = hebDate.daysInMonth();
+  var currentDate = hebDate.getDate();
+
+  for(var i=0; i<daysInMonth; i++) {
+    hebDate = hebDate.next();
+  }
+
+  var endDate = hebDate.getDate();
+
+  if(endDate != currentDate) {
+    return null;
+  }
+  
+  return hebDate.greg();
+}
+
+    </script>
+  </head>
+  <body>
+    <h1 style="width: 100%; text-align: center;">Date de la dernière saisie:</h1>
+    <div id="lastDate" style="width: 100%; text-align: center;"><i>inconnue</i></div>
+    <hr/>
+    <p style="width: 100%; text-align: center;">
+      <input style="width: 200px; height: 100px;" type="button" value="C'est aujourd'hui" onclick="startNewCycle();"/>
+    </p>
+    <script>
+main();
+    </script>
+  </body>
+</html>
