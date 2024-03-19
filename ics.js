@@ -211,6 +211,9 @@ var ics = function(uidDomain, prodId) {
       ext = (typeof ext !== 'undefined') ? ext : '.ics';
       filename = (typeof filename !== 'undefined') ? filename : 'calendar';
       var calendar = calendarStart + SEPARATOR + calendarEvents.join(SEPARATOR) + calendarEnd;
+      window.open( "data:text/calendar;charset=utf8," + calendar);
+      return;
+
 
       var blob;
       if (navigator.userAgent.indexOf('MSIE 10') === -1) { // chrome or firefox
