@@ -1,8 +1,8 @@
 <html>
   <head>
     <title>Calculateur</title>
-    <script src="ics.js"></script>
-    <script src="ics.deps.min.js"></script>
+    <script src="ouical.js"></script>
+    <link rel="stylesheet" href="main.css">
     <script src="hebcal.min.js"></script>
     <script>
 
@@ -66,9 +66,24 @@ function computeDates(newDate, lastDate) {
 }
 
 function setCalendarReminders(dates) {
-  var cal = ics();
-  dates.map(x => cal.addEvent("Pricha", "Pricha", "", x, new Date(addDaysToDate(x, 1).getTime()-1)));
-  cal.download("pricha_" + new Date().toLocaleDateString());
+  dates.map(setCalendarReminder);
+}
+
+function setCalendarReminder(date) {
+  var myCalendar = createCalendar({
+    options: {
+      class: 'my-class',
+      id: 'my-id'
+    },
+    data: {
+      title: 'Pricha', 
+      start: date,
+      duration: 24*60,
+    }
+  });
+  document.querySelector('.new-cal').appendChild(myCalendar);
+  document.getElementsByClassName("icon-ical")[0].click();
+  document.querySelector('.new-cal').removeChild(myCalendar);
 }
 
 function setCookie(date) {
@@ -125,6 +140,7 @@ function computeDateFromMonth(date) {
     <p style="width: 100%; text-align: center;">
       <input style="width: 200px; height: 100px;" type="button" value="C'est aujourd'hui" onclick="startNewCycle();"/>
     </p>
+    <div class="new-cal"></div>
     <script>
 main();
     </script>
