@@ -54,7 +54,7 @@ function startNewCycle() {
 
   setCookie(newDate);
 
-  window.location.href = window.location.href;
+  //window.location.href = window.location.href;
 }
 
 function computeDates(newDate, lastDate) {
@@ -62,28 +62,33 @@ function computeDates(newDate, lastDate) {
   result.add(computeDate30(newDate));
   result.add(computeDateFromLast(newDate, lastDate));
   result.add(computeDateFromMonth(newDate));
-  return [...result].filter(x => x!= null).map(x => new Date(new Date(x).toDateString()));
+  return [...result].filter(x => x!= null).sort((a,b) => a-b).map(x => new Date(new Date(x).toDateString()));
 }
 
 function setCalendarReminders(dates) {
-  dates.map(setCalendarReminder);
-}
 
-function setCalendarReminder(date) {
-  var myCalendar = createCalendar({
-    options: {
-      class: 'my-class',
-      id: 'my-id'
-    },
-    data: {
-      title: 'Pricha', 
-      start: date,
-      duration: 24*60,
-    }
+  var data = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0'
+  ];
+
+  dates.map(x => {
+    var startTime = x;
+    var endTime = new Date(startTime.getTime() + 864E5 - 1);
+    data.push('BEGIN:VEVENT');
+    data.push('URL:' + document.URL);
+    data.push('DTSTART:' + startTime.toISOString().replace(/-|:|\.\d+/g, ''));
+    data.push('DTEND:' + endTime.toISOString().replace(/-|:|\.\d+/g, ''));
+    data.push('SUMMARY:Pricha');
+    data.push('DESCRIPTION:');
+    data.push('END:VEVENT');
   });
-  document.querySelector('.new-cal').appendChild(myCalendar);
-  document.getElementsByClassName("icon-ical")[0].click();
-  document.querySelector('.new-cal').removeChild(myCalendar);
+
+  data.push('END:VCALENDAR');
+
+  var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
+
+  document.getElementById("new-cal").innerHTML += '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a> <ul>' + dates.map(x => '<li>' + x.toLocaleDateString() + '</li>').join() + '<ul>';
 }
 
 function setCookie(date) {
@@ -140,7 +145,7 @@ function computeDateFromMonth(date) {
     <p style="width: 100%; text-align: center;">
       <input style="width: 200px; height: 100px;" type="button" value="C'est aujourd'hui" onclick="startNewCycle();"/>
     </p>
-    <div class="new-cal"></div>
+    <div id="new-cal"></div>
     <script>
 main();
     </script>
