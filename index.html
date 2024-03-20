@@ -88,7 +88,7 @@ function setCalendarReminders(dates) {
 
   var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
 
-  document.getElementById("new-cal").innerHTML += '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a> <ul>' + dates.map(x => '<li>' + x.toLocaleDateString() + '</li>').join() + '<ul>';
+  document.getElementById("new-cal").innerHTML += '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a> <ul>' + dates.map(x => '<li>' + x.toLocaleDateString() + '</li>').join('') + '<ul>';
 }
 
 function setCookie(date) {
