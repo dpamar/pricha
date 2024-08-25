@@ -1,152 +1,203 @@
 <html>
   <head>
-    <title>Calculateur</title>
-    <script src="ouical.js"></script>
-    <link rel="stylesheet" href="main.css">
     <script src="hebcal.min.js"></script>
+    <title>Calculateur</title>
     <script>
-
-function main() {
-  var lastDate = getLastDateFromCookie();
-  displayLastDate(lastDate);
-}
-
-function readCookie() {
-  return document.cookie.split("; ").filter(x=>x.startsWith("cookie="))[0];
-}
-
-function getLastDateFromCookie() {
-  var cookie = null;
-  var cookieData = readCookie();
-  eval(cookieData);
-  if(cookie == null) return null;
-  var lastDateText = cookie.last;
-  var lastDate = new Date(cookie.last);
-  return lastDate;
-}
-
-function displayLastDate(date) {
-  if(date != null) {
-    document.getElementById('lastDate').innerHTML = date.toLocaleDateString();
-  }
-}
+var lastDateSelector = null;
+var dateSelector = null;
 
 function startNewCycle() {
-  if(!confirm("Démarrer un nouveau cycle aujourd'hui ?")) {
-    return;
-  }
-
-  var newDate = new Date(new Date().toDateString());
-  var lastDate = getLastDateFromCookie();
-
-  if(lastDate == null && confirm("Voulez-vous renseigner la date précédente ?")) {
-    while(lastDate == null || lastDate == "Invalid Date") {
-      var dateText = prompt("Quelle est la date de début du dernier cycle ? (jj/mm/aaaa)").split("/");
-      dateText = [1,0,2].map(x => dateText[x]).join('/');
-      lastDate = new Date(dateText);
+    if(!confirm("Démarrer un nouveau cycle ?")) {
+        return;
     }
-  }
+    var lastCycleDate = lastDateSelector.value;
+    var newCycleDate = dateSelector.value;
 
-  var dates = computeDates(newDate, lastDate);
-
-  setCalendarReminders(dates);
-
-  setCookie(newDate);
-
-  //window.location.href = window.location.href;
+    var dateRanges = computeDates(newCycleDate, lastCycleDate);
+    
+    setCalendarReminders(dateRanges);
+    
+    setCookie(newCycleDate);
 }
 
 function computeDates(newDate, lastDate) {
-  var result = new Set();
-  result.add(computeDate30(newDate));
-  result.add(computeDateFromLast(newDate, lastDate));
-  result.add(computeDateFromMonth(newDate));
-  return [...result].filter(x => x!= null).sort((a,b) => a-b).map(x => new Date(new Date(x).toDateString()));
+    var result = [];
+
+    var newHebrewDate = getHebrewDate(newDate);
+    var lastHebrewDate = isDateValid(lastDate) ? getHebrewDate(lastDate) : null;
+
+    result.push(computeDate30(newHebrewDate));
+    result.push(computeDateFromMonth(newHebrewDate));
+    result.push(computeDateFromLast(newHebrewDate, lastHebrewDate));
+    result = filterDates(result);
+
+    var newCycleDuringDay = isDay(newDate);
+  
+    return getDateRanges(result, newCycleDuringDay);
 }
 
-function setCalendarReminders(dates) {
+function getHebrewDate(date) {
+    var hebrewDate = Hebcal.HDate(date);
+    if (hebrewDate.getZemanim().shkiah < date) hebrewDate = hebrewDate.next();
+    return hebrewDate();
+}
 
-  var data = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0'
-  ];
+function isDateValid(date) {
+    return date != null && date != "Invalid Date";
+}
 
-  dates.map(x => {
-    var startTime = x;
-    var endTime = new Date(startTime.getTime() + 864E5 - 1);
-    data.push('BEGIN:VEVENT');
-    data.push('URL:' + document.URL);
-    data.push('DTSTART:' + startTime.toISOString().replace(/-|:|\.\d+/g, ''));
-    data.push('DTEND:' + endTime.toISOString().replace(/-|:|\.\d+/g, ''));
-    data.push('SUMMARY:Pricha');
-    data.push('DESCRIPTION:');
-    data.push('END:VEVENT');
-  });
+function computeDate30(hebrewDate) {
+    return addDaysToHebrewDate(hebrewDate, 30);
+}
 
-  data.push('END:VCALENDAR');
+function addDaysToHebrewDate(date, nbDays) {
+    var result = Hebcal.HDate(date.greg());
+    for(i = 0; i<nbDays; i++) result = result.next();
+    return result;
+}
 
-  var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
+function computeDateFromMonth(hebrewDate) {
+    var daysInMonth = hebrewDate.getMonthObject().length;
+    var newDate = addDaysToHebrewDate(hebrewDate, daysInMonth);
+    if(newDate.getDate() != hebrewDate.getDate()) return null;
+    return newDate();
+}
 
-  document.getElementById("new-cal").innerHTML += '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a> <ul>' + dates.map(x => '<li>' + x.toLocaleDateString() + '</li>').join('') + '<ul>';
+function computeDateFromLast(newHebrewDate, lastHebrewDate) {
+    if(lastDate == null) {
+      alert("Attention: impossible de calculer une des dates sans connaitre le début du cycle précédent");
+      return null;
+    }
+    var nbDaysBetween = getDaysBetweenHebrewDates(newHebrewDate, lastHebrewDate);
+    return addDaysToDate(newDate, nbDaysBetween);
+}
+
+function getDaysBetweenHebrewDates(fromDate, toDate) {
+    return Math.round((toDate.greg() - fromDate.greg())/864E5);
+}
+
+function filterDates(hebrewDates) {
+    var result = hebrewDates
+        .filter(x => x != null)
+        .map(x => x.getTime());
+    result = result
+        .filter((x,i) => result.indexOf(x) == i)
+        .map(x => new Date(x))
+        .map(getHebrewDate);
+    return result;
+}
+
+function isDay(gregorianDate) {
+    var hebDate = Hebcal.HDate(gregorianDate);
+    if (hebDate.getZemanim().shkiah < gregorianDate) return false;
+    return hebDate.getZemanim().neitz_hachama <= gregorianDate;
+}
+
+function getDateRanges(hebrewDates, useDayPeriod) {
+    return hebrewDates.map(x => getDateRange(x, useDayPeriod));
+}
+
+function getDateRange(hebrewDate, useDayPeriod) {
+    if (useDayPeriod)
+        return [hebrewDate.getZemanim().neitz_hachama, hebrewDate.getZemanim().shkiah];
+    else
+        return [hebrewDate.getZemanim().shkiah, hebrewDate.next().getZemanim().neitz_hachama];
+}
+
+function setCalendarReminders(dateRanges) {
+    var data = ['BEGIN:VCALENDAR','VERSION:2.0'];
+    
+    dateRanges.map(x => {
+      var startTime = x[0];
+      var endTime = x[1];
+      data.push('BEGIN:VEVENT');
+      data.push('URL:' + document.URL);
+      data.push('DTSTART:' + startTime.toISOString().replace(/-|:|\.\d+/g, ''));
+      data.push('DTEND:' + endTime.toISOString().replace(/-|:|\.\d+/g, ''));
+      data.push('SUMMARY:Pricha');
+      data.push('DESCRIPTION:');
+      data.push('END:VEVENT');
+    });
+
+    data.push('END:VCALENDAR');
+
+    var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
+
+    document.getElementById("new-cal").innerHTML += 
+        '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a>' + 
+        '<ul>' +
+        dates.map(x => '<li> Du ' + x[0].toLocaleString() + ' au ' + x[1].toLocaleString() + '</li>').join('') +
+        '<ul>';
 }
 
 function setCookie(date) {
-  var data = '{"last": "' + date.toDateString() + '"}';
-  setCookieData(data);
+    var data = '{"last": "' + date.toString() + '"}';
+    writeCookie(data);
 }
 
-function setCookieData(data) {
-  document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
-}
-
-function addDaysToDate(date, days) {
-  return new Date(date.getTime() + days * 864E5);
-}
-
-function computeDate30(date) {
-  return addDaysToDate(date, 30);
-}
-
-function computeDateFromLast(newDate, lastDate) {
-  if(lastDate == null) {
-    alert("Attention: impossible de calculer une des dates sans connaitre le début du cycle précédent");
-    return null;
-  }
-  var nbDaysBetween = Math.round((newDate - lastDate) / 864E5);
-  return addDaysToDate(newDate, nbDaysBetween);
-}
-
-function computeDateFromMonth(date) {
-  var hebDate = Hebcal.HDate(date);
-
-  var daysInMonth = hebDate.daysInMonth();
-  var currentDate = hebDate.getDate();
-
-  for(var i=0; i<daysInMonth; i++) {
-    hebDate = hebDate.next();
-  }
-
-  var endDate = hebDate.getDate();
-
-  if(endDate != currentDate) {
-    return null;
-  }
-  
-  return hebDate.greg();
+function writeCookie(data) {
+    document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
 }
 
     </script>
   </head>
   <body>
-    <h1 style="width: 100%; text-align: center;">Date de la dernière saisie:</h1>
-    <div id="lastDate" style="width: 100%; text-align: center;"><i>inconnue</i></div>
-    <hr/>
-    <p style="width: 100%; text-align: center;">
-      <input style="width: 200px; height: 100px;" type="button" value="C'est aujourd'hui" onclick="startNewCycle();"/>
+    <h1 style="width: 100%; text-align: center;">Date de la derni&egrave;re saisie:</h1>
+    <p align="center">
+      <input
+        type="datetime-local"
+        id="lastDateSelector"
+        name="lastDateSelector" />
+    </p>
+    <h1 style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
+    <p align="center">
+      <input
+        type="datetime-local"
+        id="dateSelector"
+        name="dateSelector" />
     </p>
     <div id="new-cal"></div>
     <script>
-main();
+
+function getElement(id) {
+    return document.getElementById(id);
+}
+
+function setCalendarValue(cal, date) {
+    if(!isDateValid(date)) return;
+    cal.value = date2Text(date);
+}
+
+function pad2(value) {
+    return ("00" + value).substr(-2);
+}
+
+function date2Text(date) {
+    return date.getFullYear() + "-" + 
+        pad2(date.getMonth() + 1) + "-" +
+        pad2(date.getDate()) + "T" + 
+        pad2(date.getHours()) + ":" + 
+        pad2(date.getMinutes()) + ":" + 
+        pad2(date.getSeconds());
+}
+
+function readCookie() {
+    return document.cookie.split("; ").filter(x=>x.startsWith("cookie="))[0];
+}
+
+function getDateFromCookie() {
+    var cookie = null;
+    eval(readCookie());
+    if(cookie == null) return null;
+    var lastDate = new Date(+cookie.last);
+    return lastDate;
+}
+
+lastDateSelector = getElement("lastDateSelector");
+dateSelector = getElement("dateSelector");
+
+setCalendarValue(lastDateSelector, getDateFromCookie());
+setCalendarValue(dateSelector, new Date());
     </script>
   </body>
 </html>
