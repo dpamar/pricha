@@ -1,8 +1,10 @@
 <html>
-  <head>
-    <script src="hebcal.min.js"></script>
-    <title>Calculateur</title>
-    <script>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+        <script src="hebcal.min.js"></script>
+        <title>Calculateur</title>
+        <script>
 var lastDateSelector = null;
 var dateSelector = null;
 
@@ -10,8 +12,8 @@ function startNewCycle() {
     if(!confirm("Démarrer un nouveau cycle ?")) {
         return;
     }
-    var lastCycleDate = lastDateSelector.value;
-    var newCycleDate = dateSelector.value;
+    var lastCycleDate = new Date(lastDateSelector.value);
+    var newCycleDate = new Date(dateSelector.value);
 
     var dateRanges = computeDates(newCycleDate, lastCycleDate);
     
@@ -39,7 +41,7 @@ function computeDates(newDate, lastDate) {
 function getHebrewDate(date) {
     var hebrewDate = Hebcal.HDate(date);
     if (hebrewDate.getZemanim().shkiah < date) hebrewDate = hebrewDate.next();
-    return hebrewDate();
+    return hebrewDate;
 }
 
 function isDateValid(date) {
@@ -60,16 +62,16 @@ function computeDateFromMonth(hebrewDate) {
     var daysInMonth = hebrewDate.getMonthObject().length;
     var newDate = addDaysToHebrewDate(hebrewDate, daysInMonth);
     if(newDate.getDate() != hebrewDate.getDate()) return null;
-    return newDate();
+    return newDate;
 }
 
 function computeDateFromLast(newHebrewDate, lastHebrewDate) {
-    if(lastDate == null) {
+    if(lastHebrewDate == null) {
       alert("Attention: impossible de calculer une des dates sans connaitre le début du cycle précédent");
       return null;
     }
-    var nbDaysBetween = getDaysBetweenHebrewDates(newHebrewDate, lastHebrewDate);
-    return addDaysToDate(newDate, nbDaysBetween);
+    var nbDaysBetween = getDaysBetweenHebrewDates(lastHebrewDate, newHebrewDate);
+    return addDaysToHebrewDate(newHebrewDate, nbDaysBetween);
 }
 
 function getDaysBetweenHebrewDates(fromDate, toDate) {
@@ -79,7 +81,7 @@ function getDaysBetweenHebrewDates(fromDate, toDate) {
 function filterDates(hebrewDates) {
     var result = hebrewDates
         .filter(x => x != null)
-        .map(x => x.getTime());
+        .map(x => x.getZemanim().chatzot.getTime());
     result = result
         .filter((x,i) => result.indexOf(x) == i)
         .map(x => new Date(x))
@@ -124,14 +126,14 @@ function setCalendarReminders(dateRanges) {
     var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
 
     document.getElementById("new-cal").innerHTML += 
-        '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dates.length + ' dates</a>' + 
+        '<a target="_blank" href="' + href + '">Ajouter un rappel pour les ' + dateRanges.length + ' dates</a>' + 
         '<ul>' +
-        dates.map(x => '<li> Du ' + x[0].toLocaleString() + ' au ' + x[1].toLocaleString() + '</li>').join('') +
+        dateRanges.map(x => '<li> Du ' + x[0].toLocaleString() + ' au ' + x[1].toLocaleString() + '</li>').join('') +
         '<ul>';
 }
 
 function setCookie(date) {
-    var data = '{"last": "' + date.toString() + '"}';
+    var data = '{"last": "' + date.getTime() + '"}';
     writeCookie(data);
 }
 
@@ -139,25 +141,23 @@ function writeCookie(data) {
     document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
 }
 
-    </script>
-  </head>
-  <body>
-    <h1 style="width: 100%; text-align: center;">Date de la derni&egrave;re saisie:</h1>
-    <p align="center">
-      <input
-        type="datetime-local"
-        id="lastDateSelector"
-        name="lastDateSelector" />
-    </p>
-    <h1 style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
-    <p align="center">
-      <input
-        type="datetime-local"
-        id="dateSelector"
-        name="dateSelector" />
-    </p>
-    <div id="new-cal"></div>
-    <script>
+        </script>
+    </head>
+    <body>
+        <h1 style="width: 100%; text-align: center;">Date du dernier cycle:</h1>
+        <p align="center">
+            <input type="datetime-local" id="lastDateSelector" name="lastDateSelector" />
+        </p>
+        <h1 style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
+        <p align="center">
+            <input type="datetime-local" id="dateSelector" name="dateSelector" />
+        </p>
+        <hr/>
+        <p style="width: 100%; text-align: center;">
+            <input style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycle();"/>
+        </p>
+        <div id="new-cal"></div>
+        <script>
 
 function getElement(id) {
     return document.getElementById(id);
@@ -198,6 +198,6 @@ dateSelector = getElement("dateSelector");
 
 setCalendarValue(lastDateSelector, getDateFromCookie());
 setCalendarValue(dateSelector, new Date());
-    </script>
-  </body>
+        </script>
+    </body>
 </html>
