@@ -101,7 +101,7 @@ function getDateRanges(hebrewDates, useDayPeriod) {
 
 function getDateRange(hebrewDate, useDayPeriod) {
     if (useDayPeriod)
-        return [hebrewDate.getZemanim().neitz_hachama, hebrewDate.getZemanim().shkiah];
+        return [hebrewDate.getZemanim().alot_hashachar, hebrewDate.getZemanim().shkiah];
     else
         return [hebrewDate.getZemanim().shkiah, hebrewDate.next().getZemanim().neitz_hachama];
 }
