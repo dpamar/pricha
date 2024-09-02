@@ -1,7 +1,5 @@
 var lastDateSelector = null;
 var dateSelector = null;
-var cookieProperties = ["last", "lang"];
-var cookieData = {last: null, lang: "fr"};
 var testMode = false;
 
 function startNewCycle() {
@@ -128,16 +126,6 @@ function setCalendarReminders(dateRanges) {
         '<ul>';
 }
 
-function setCookieLastDate(date) {
-    cookieData.last = date.getTime();
-    writeCookie();
-}
-
-function writeCookie() {
-    var data = '{' + cookieProperties.map(prop => '"' + prop + '": "' + cookieData[prop] + '"').join(", ") + '}';
-    document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
-}
-
 function getElement(id) {
     return document.getElementById(id);
 }
@@ -158,19 +146,6 @@ function date2Text(date) {
         pad2(date.getHours()) + ":" + 
         pad2(date.getMinutes()) + ":" + 
         pad2(date.getSeconds());
-}
-
-function readCookie() {
-    var cookie = null;
-    var cookieValue = document.cookie.split("; ").filter(x=>x.startsWith("cookie="))[0];
-    if(cookieValue != null) eval(cookieValue);
-    if(cookie != null) cookieProperties.map(prop => cookie[prop] != null && (cookieData[prop] = cookie[prop]));
-}
-
-function getDateFromCookie() {
-    if(cookieData.last == null) return null;
-    var lastDate = new Date(+cookieData.last);
-    return lastDate;
 }
 
 function showMessage(strId, useConfirm) {
