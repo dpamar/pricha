@@ -8,7 +8,9 @@ var en = {
     "startNewCycle": "Start a new cycle ?",
     "noPreviousDateWarning": "Warning: it's not possible to compute one of the dates without the previous cycle date",
     "addReminders": "Add a calendar reminder for the XXX dates",
-    "fromTo": "From XXX to YYY"
+    "fromTo": "From XXX to YYY",
+    "durationBtn_half": "Half days",
+    "durationBtn_full": "Full days (Or Zaruach) for some ashkenazim"
 }
 
 var fr = {
@@ -19,7 +21,9 @@ var fr = {
     "startNewCycle": "Démarrer un nouveau cycle ?",
     "noPreviousDateWarning": "Attention: impossible de calculer une des dates sans connaitre le début du cycle précédent",
     "addReminders": "Ajouter un rappel pour les XXX dates",
-    "fromTo": "Du XXX au YYY"
+    "fromTo": "Du XXX au YYY",
+    "durationBtn_half": "Demi-journées",
+    "durationBtn_full": "Journées complètes (Or Zaruach) pour certains ashkenazes"
 }
 
 function getLanguage() {
@@ -42,6 +46,9 @@ function localize() {
     getElement("lastCycleLabel").innerText = getStr("lastCycleLabel");
     getElement("newCycleLabel").innerText = getStr("newCycleLabel");
     getElement("newCycleButton").value = getStr("newCycleButton");
+
+    getElement("durationBtn_half").innerText = getStr("durationBtn_half");
+    getElement("durationBtn_full").innerText = getStr("durationBtn_full");
 
     languages.map(lang => getElement("langBtn_" + lang).style.fontStyle = getLanguage() == lang ? "italic" : "normal");
 }

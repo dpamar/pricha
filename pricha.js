@@ -86,7 +86,7 @@ function filterDates(hebrewDates) {
 function isDay(gregorianDate) {
     var hebDate = Hebcal.HDate(gregorianDate);
     if (hebDate.getZemanim().shkiah < gregorianDate) return false;
-    return hebDate.getZemanim().neitz_hachama <= gregorianDate;
+    return hebDate.getZemanim().alot_hashachar <= gregorianDate;
 }
 
 function getDateRanges(hebrewDates, useDayPeriod) {
@@ -94,10 +94,20 @@ function getDateRanges(hebrewDates, useDayPeriod) {
 }
 
 function getDateRange(hebrewDate, useDayPeriod) {
-    if (useDayPeriod)
-        return [hebrewDate.getZemanim().alot_hashachar, hebrewDate.getZemanim().shkiah];
-    else
-        return [hebrewDate.getZemanim().prev().shkiah, hebrewDate.getZemanim().neitz_hachama];
+    var orZaruach = +cookieData.orZaruach;
+    if (useDayPeriod) {
+        if(orZaruach) {
+            return [hebrewDate.prev().getZemanim().shkiah, hebrewDate.getZemanim().shkiah];
+        } else {
+            return [hebrewDate.getZemanim().alot_hashachar, hebrewDate.getZemanim().shkiah];
+        }
+    } else {
+        if(orZaruach) {
+            return [hebrewDate.prev().getZemanim().alot_hashachar, hebrewDate.getZemanim().alot_hashachar];
+        } else {
+            return [hebrewDate.prev().getZemanim().shkiah, hebrewDate.getZemanim().alot_hashachar];
+        }
+    }
 }
 
 function setCalendarReminders(dateRanges) {
@@ -119,7 +129,7 @@ function setCalendarReminders(dateRanges) {
 
     var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
 
-    document.getElementById("new-cal").innerHTML = 
+    getElement("new-cal").innerHTML = 
         '<a target="_blank" href="' + href + '">' + getStr("addReminders").replace("XXX", dateRanges.length) + '</a>' + 
         '<ul>' +
         dateRanges.map(x => '<li>' + getStr("fromTo").replace("XXX", x[0].toLocaleString()).replace("YYY", x[1].toLocaleString()) + '</li>').join('') +
@@ -156,4 +166,10 @@ function showMessage(strId, useConfirm) {
 
 function enableTestMode() {
     testMode = true;
+}
+
+function setOrZaruach(value) {
+    cookieData.orZaruach = value;
+    writeCookie();
+    reloadSettingsButtons();
 }
