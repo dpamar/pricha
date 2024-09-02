@@ -22,6 +22,9 @@
             <input id="newCycleButton" style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycle();"/>
         </p>
         <div id="new-cal"></div>
+        <hr/>
+        <a href="#" id="langBtn_fr" style="font-style: normal" onclick="setLang('fr');">Français</a>&nbsp;
+        <a href="#" id="langBtn_en" style="font-style: normal" onclick="setLang('en');">English</a>&nbsp;
         <script>
 readCookie();
 localize();
@@ -32,8 +35,5 @@ dateSelector = getElement("dateSelector");
 setCalendarValue(lastDateSelector, getDateFromCookie());
 setCalendarValue(dateSelector, new Date());
         </script>
-        <hr/>
-        <a href="#" onclick="setLang('fr');">Français</a>&nbsp;
-        <a href="#" onclick="setLang('en');">English</a>&nbsp;
     </body>
 </html>
