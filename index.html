@@ -3,25 +3,27 @@
         <meta charset="UTF-8">
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
         <script src="hebcal.min.js"></script>
+        <script src="lang.js"></script>
         <script src="pricha.js"></script>
         <title>Calculateur</title>
     </head>
     <body>
-        <h1 style="width: 100%; text-align: center;">Date du dernier cycle:</h1>
+        <h1 id="lastCycleLabel" style="width: 100%; text-align: center;">Date du dernier cycle:</h1>
         <p align="center">
             <input type="datetime-local" id="lastDateSelector" name="lastDateSelector" />
         </p>
-        <h1 style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
+        <h1 id="newCycleLabel" style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
         <p align="center">
             <input type="datetime-local" id="dateSelector" name="dateSelector" />
         </p>
         <hr/>
         <p style="width: 100%; text-align: center;">
-            <input style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycle();"/>
+            <input id="newCycleButton" style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycle();"/>
         </p>
         <div id="new-cal"></div>
         <script>
 readCookie();
+localize();
 
 lastDateSelector = getElement("lastDateSelector");
 dateSelector = getElement("dateSelector");
@@ -29,5 +31,8 @@ dateSelector = getElement("dateSelector");
 setCalendarValue(lastDateSelector, getDateFromCookie());
 setCalendarValue(dateSelector, new Date());
         </script>
+        <hr/>
+        <a href="#" onclick="setLang('fr');">Français</a>&nbsp;
+        <a href="#" onclick="setLang('en');">English</a>&nbsp;
     </body>
 </html>
