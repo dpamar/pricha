@@ -2,9 +2,10 @@ var lastDateSelector = null;
 var dateSelector = null;
 var cookieProperties = ["last", "lang"];
 var cookieData = {last: null, lang: "fr"};
+var testMode = false;
 
 function startNewCycle() {
-    if(!confirm(getStr("startNewCycle"))) {
+    if(!showMessage("startNewCycle", 1)) {
         return;
     }
     var lastCycleDate = new Date(lastDateSelector.value);
@@ -62,7 +63,7 @@ function computeDateFromMonth(hebrewDate) {
 
 function computeDateFromLast(newHebrewDate, lastHebrewDate) {
     if(lastHebrewDate == null) {
-      alert(getStr("noPreviousDateWarning"));
+      showMessage("noPreviousDateWarning", 0);
       return null;
     }
     var nbDaysBetween = getDaysBetweenHebrewDates(lastHebrewDate, newHebrewDate);
@@ -170,4 +171,14 @@ function getDateFromCookie() {
     if(cookieData.last == null) return null;
     var lastDate = new Date(+cookieData.last);
     return lastDate;
+}
+
+function showMessage(strId, useConfirm) {
+    if(testMode) return true;
+    if(useConfirm) return confirm(getStr(strId));
+    alert(getStr(strId));
+}
+
+function enableTestMode() {
+    testMode = true;
 }
