@@ -1,14 +1,26 @@
-var cookieProperties = ["last", "lang", "orZaruach"];
-var cookieData = {last: null, lang: "fr", orZaruach: 0};
+var cookieProperties = ["last", "lang", "orZaruach", "history"];
+var cookieData = {last: null, lang: "fr", orZaruach: 0, "history": []};
+
+var HISTORY_LIMIT = 36;
 
 function setCookieLastDate(date) {
     cookieData.last = date.getTime();
+    cookieData.history.push(date.getTime());
+    if(cookieData.history.length > HISTORY_LIMIT) cookieData.history.shift();
     writeCookie();
 }
 
 function writeCookie() {
-    var data = '{' + cookieProperties.map(prop => '"' + prop + '": "' + cookieData[prop] + '"').join(", ") + '}';
+    var data = '{' + cookieProperties.map(prop => format(prop)).join(", ") + '}';
     document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
+}
+
+function format(propertyName) {
+    var prefix = '"' + propertyName + '": ';
+    if(propertyName == "history") {
+        return prefix + "[" + cookieData.history.join(',') + "]";
+    }
+    return prefix + '"' + cookieData[propertyName] + '"';
 }
 
 function readCookie() {
@@ -16,7 +28,6 @@ function readCookie() {
     var cookieValue = document.cookie.split("; ").filter(x=>x.startsWith("cookie="))[0];
     if(cookieValue != null) eval(cookieValue);
     if(cookie != null) cookieProperties.map(prop => cookie[prop] != null && (cookieData[prop] = cookie[prop]));
-
     reloadSettingsButtons();
 }
 
