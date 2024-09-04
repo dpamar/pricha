@@ -12,16 +12,38 @@
         <div id="testResults"></div>
         <script>
 var tests = [
+    "testGetHebrewDate_noon",
+    "testGetHebrewDate_lateEvening",
     "testDate30_29DaysMonth",
-    "testDate30_30DaysMonth"
+    "testDate30_30DaysMonth",
+    "testDateFromMonth_29DaysMonth",
+    "testDateFromMonth_30DaysMonth"
 ];
 
 tests.map(test => getElement("testResults").innerHTML += test + "&nbsp;:&nbsp;" + ((message = eval(test)()) ? "KO !! " + message : "OK") + "<br/>");
 
+function testGetHebrewDate_noon() {
+    // Date : 2024/01/01, noon --> 20 Tevet 5784
+    var date = new Date(2024, 0, 1, 12);
+
+    var hebrewDate = getHebrewDate(date);
+
+    return assertEq("Invalid hebrew date", "20 Tevet 5784", hebrewDate.toString());
+}
+
+function testGetHebrewDate_lateEvening() {
+    // Date : 2024/01/01, 10PM --> 21 Tevet 5784
+    var date = new Date(2024, 0, 1, 22);
+
+    var hebrewDate = getHebrewDate(date);
+
+    return assertEq("Invalid hebrew date", "21 Tevet 5784", hebrewDate.toString());
+}
+
 function testDate30_29DaysMonth() {
     // Start : 2024/01/01, noon --> 20 Tevet 5784
-    // Expected end date : 2024/01/01 --> 21 Shevat 5784
-    var startDate = new Date(2024, 0, 1);
+    // Expected end date : 2024/01/31 --> 21 Shevat 5784
+    var startDate = new Date(2024, 0, 1, 12);
 
     var hebrewDate = getHebrewDate(startDate);
     var computedDate = computeDate30(hebrewDate);
@@ -33,10 +55,34 @@ function testDate30_29DaysMonth() {
 function testDate30_30DaysMonth() {
     // Start : 2024/01/31, noon --> 21 Shevat 5784
     // Expected end date : 2024/03/01 --> 21 Adar 1 5784
-    var startDate = new Date(2024, 0, 31);
+    var startDate = new Date(2024, 0, 31, 12);
 
     var hebrewDate = getHebrewDate(startDate);
     var computedDate = computeDate30(hebrewDate);
+
+    return assertEq("Invalid hebrew date", "21 Adar 1 5784", computedDate.toString())
+        || assertEq("Invalid gregorian date", "Fri Mar 01 2024", computedDate.greg().toDateString());
+}
+
+function testDateFromMonth_29DaysMonth() {
+    // Start : 2024/01/01, noon --> 20 Tevet 5784
+    // Expected end date : 2024/01/30 --> 20 Shevat 5784
+    var startDate = new Date(2024, 0, 1, 12);
+
+    var hebrewDate = getHebrewDate(startDate);
+    var computedDate = computeDateFromMonth(hebrewDate);
+
+    return assertEq("Invalid hebrew date", "20 Shevat 5784", computedDate.toString())
+        || assertEq("Invalid gregorian date", "Tue Jan 30 2024", computedDate.greg().toDateString());
+}
+
+function testDateFromMonth_30DaysMonth() {
+    // Start : 2024/01/31, noon --> 21 Shevat 5784
+    // Expected end date : 2024/03/01 --> 21 Adar 1 5784
+    var startDate = new Date(2024, 0, 31, 12);
+
+    var hebrewDate = getHebrewDate(startDate);
+    var computedDate = computeDateFromMonth(hebrewDate);
 
     return assertEq("Invalid hebrew date", "21 Adar 1 5784", computedDate.toString())
         || assertEq("Invalid gregorian date", "Fri Mar 01 2024", computedDate.greg().toDateString());
