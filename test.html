@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+        <script src="hebcal.min.js"></script>
+        <script src="cookie.js"></script>
+        <script src="lang.js"></script>
+        <script src="pricha.js"></script>
+        <title>Test page</title>
+    </head>
+    <body>
+        <div id="testResults"></div>
+        <script>
+var tests = [
+    "testDate30_29DaysMonth",
+    "testDate30_30DaysMonth"
+];
+
+tests.map(test => getElement("testResults").innerHTML += test + "&nbsp;:&nbsp;" + ((message = eval(test)()) ? "KO !! " + message : "OK") + "<br/>");
+
+function testDate30_29DaysMonth() {
+    // Start : 2024/01/01, noon --> 20 Tevet 5784
+    // Expected end date : 2024/01/01 --> 21 Shevat 5784
+    var startDate = new Date(2024, 0, 1);
+
+    var hebrewDate = getHebrewDate(startDate);
+    var computedDate = computeDate30(hebrewDate);
+
+    return assertEq("Invalid hebrew date", "21 Shevat 5784", computedDate.toString())
+        || assertEq("Invalid gregorian date", "Wed Jan 31 2024", computedDate.greg().toDateString());
+}
+
+function testDate30_30DaysMonth() {
+    // Start : 2024/01/31, noon --> 21 Shevat 5784
+    // Expected end date : 2024/03/01 --> 21 Adar 1 5784
+    var startDate = new Date(2024, 0, 31);
+
+    var hebrewDate = getHebrewDate(startDate);
+    var computedDate = computeDate30(hebrewDate);
+
+    return assertEq("Invalid hebrew date", "21 Adar 1 5784", computedDate.toString())
+        || assertEq("Invalid gregorian date", "Fri Mar 01 2024", computedDate.greg().toDateString());
+}
+
+function assertEq(message, expected, computed) {
+    if(expected == computed) return null;
+    return message + " : " + computed + ", expecting " + expected;
+}
+        </script>
+    </body>
+</html>

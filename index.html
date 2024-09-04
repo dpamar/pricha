@@ -19,7 +19,7 @@
         </p>
         <hr/>
         <p style="width: 100%; text-align: center;">
-            <input id="newCycleButton" style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycle();"/>
+            <input id="newCycleButton" style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycleFromButton();"/>
         </p>
         <div id="new-cal"></div>
         <hr/>
@@ -29,6 +29,7 @@
         <a href="#" id="durationBtn_half" style="font-style: normal" onclick="setOrZaruach(0);">Demi-journées</a>&nbsp;
         <a href="#" id="durationBtn_full" style="font-style: normal" onclick="setOrZaruach(1);">Journées complètes (Or Zaruach)</a>&nbsp;
         <script>
+initCookie();
 readCookie();
 localize();
 

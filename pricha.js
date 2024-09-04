@@ -2,17 +2,18 @@ var lastDateSelector = null;
 var dateSelector = null;
 var testMode = false;
 
-function startNewCycle() {
+function startNewCycleFromButton() {
     if(!showMessage("startNewCycle", 1)) {
         return;
     }
     var lastCycleDate = new Date(lastDateSelector.value);
     var newCycleDate = new Date(dateSelector.value);
+    startNewCycle(newCycleDate, lastCycleDate);
+}
 
+function startNewCycle(newCycleDate, lastCycleDate) {
     var dateRanges = computeDates(newCycleDate, lastCycleDate);
-    
     setCalendarReminders(dateRanges);
-    
     setCookieLastDate(newCycleDate);
 }
 

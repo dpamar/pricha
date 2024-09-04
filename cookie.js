@@ -1,7 +1,11 @@
 var cookieProperties = ["last", "lang", "orZaruach", "history"];
-var cookieData = {last: null, lang: "fr", orZaruach: 0, "history": []};
+var cookieData = null;
 
 var HISTORY_LIMIT = 36;
+
+function initCookie() {
+    cookieData = {last: null, lang: "fr", orZaruach: 0, "history": []};
+}
 
 function setCookieLastDate(date) {
     cookieData.last = date.getTime();
