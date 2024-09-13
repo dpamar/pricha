@@ -118,7 +118,7 @@ function setCalendarReminders(dateRanges) {
       var startTime = x[0];
       var endTime = x[1];
       data.push('BEGIN:VEVENT');
-      data.push('URL:' + document.URL);
+      data.push('URL:' + getExportUrl());
       data.push('DTSTART:' + startTime.toISOString().replace(/-|:|\.\d+/g, ''));
       data.push('DTEND:' + endTime.toISOString().replace(/-|:|\.\d+/g, ''));
       data.push('SUMMARY:Pricha');
