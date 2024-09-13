@@ -6,6 +6,7 @@
         <script src="hebcal.min.js"></script>
         <script src="cookie.js"></script>
         <script src="lang.js"></script>
+        <script src="export.js"></script>
         <script src="pricha.js"></script>
         <title>Calculateur</title>
     </head>
@@ -29,10 +30,13 @@
         &nbsp;|&nbsp;
         <a href="#" id="durationBtn_half" style="font-style: normal" onclick="setOrZaruach(0);">Demi-journées</a>&nbsp;
         <a href="#" id="durationBtn_full" style="font-style: normal" onclick="setOrZaruach(1);">Journées complètes (Or Zaruach)</a>&nbsp;
+        &nbsp;|&nbsp;
+        <a href="#" id="exportBtn" style="font-style: normal" onclick="exportData();">Exporter les données vers un autre appareil</a>&nbsp;
         <script>
 initCookie();
 readCookie();
 localize();
+importCookie();
 
 lastDateSelector = getElement("lastDateSelector");
 dateSelector = getElement("dateSelector");

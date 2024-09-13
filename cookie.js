@@ -7,6 +7,16 @@ function initCookie() {
     cookieData = {last: null, lang: "fr", orZaruach: 0, "history": []};
 }
 
+function importCookie() {
+    if(window.location.href.indexOf("?backupData=") > 0) {
+        var backup = window.location.href.split("?backupData=")[1];
+        if(confirm(getStr("importData"))) {
+            writeCookieData(atob(backup));
+        }
+        window.location.href = window.location.href.replace(/\?backupData=.*$/, "");
+    }
+}
+
 function setCookieLastDate(date) {
     cookieData.last = date.getTime();
     cookieData.history.push(date.getTime());
@@ -15,8 +25,16 @@ function setCookieLastDate(date) {
 }
 
 function writeCookie() {
-    var data = '{' + cookieProperties.map(prop => format(prop)).join(", ") + '}';
+    var data = getCookieAsText();
+    writeCookieData(data);
+}
+
+function writeCookieData(data) {
     document.cookie = "cookie=" + data + "; expires=Sat, Feb 01 2200 12:00:00 UTC; path=/";
+}
+
+function getCookieAsText() {
+    return '{' + cookieProperties.map(prop => format(prop)).join(", ") + '}';
 }
 
 function format(propertyName) {

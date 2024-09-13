@@ -10,7 +10,10 @@ var en = {
     "addReminders": "Add a calendar reminder for the XXX dates",
     "fromTo": "From XXX to YYY",
     "durationBtn_half": "Half days",
-    "durationBtn_full": "Full days (Or Zaruach) for some ashkenazim"
+    "durationBtn_full": "Full days (Or Zaruach) for some ashkenazim",
+    "exportBtn": "Export data to another device",
+    "exportTitle": "Perisha calculator backup",
+    "importData": "Do you want to replace your data and use this backup ?"
 }
 
 var fr = {
@@ -23,7 +26,10 @@ var fr = {
     "addReminders": "Ajouter un rappel pour les XXX dates",
     "fromTo": "Du XXX au YYY",
     "durationBtn_half": "Demi-journées",
-    "durationBtn_full": "Journées complètes (Or Zaruach) pour certains ashkenazes"
+    "durationBtn_full": "Journées complètes (Or Zaruach) pour certains ashkenazes",
+    "exportBtn": "Exporter les données vers un autre appareil",
+    "exportTitle": "Sauvegarde calculateur de pricha",
+    "importData": "Souhaitez-vous remplacer vos données par cette sauvegarde ?"
 }
 
 function getLanguage() {
@@ -49,6 +55,8 @@ function localize() {
 
     getElement("durationBtn_half").innerText = getStr("durationBtn_half");
     getElement("durationBtn_full").innerText = getStr("durationBtn_full");
+
+    getElement("exportBtn").innerText = getStr("exportBtn");
 
     languages.map(lang => getElement("langBtn_" + lang).style.fontStyle = getLanguage() == lang ? "italic" : "normal");
 }
