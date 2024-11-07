@@ -14,7 +14,6 @@ function getExportUrl() {
 function getBackupData() {
     var conf = getConfiguration();
     var data = JSON.stringify(conf);
-    alert(data);
     return btoa(data);
 }
 
