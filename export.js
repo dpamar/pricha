@@ -3,10 +3,21 @@ function exportData() {
     sharedData["title"] = getStr("exportTitle");
     sharedData["url"] = getExportUrl();
     navigator.share(sharedData);
-};
+}
 
 function getExportUrl() {
     return this.location.href.replace(/#.*/,'')
         + "?backupData="
-        + btoa(getCookieAsText());
+        + getBackupData();
+}
+
+function getBackupData() {
+    var conf = getConfiguration();
+    var data = JSON.stringify(conf);
+    alert(data);
+    return btoa(data);
+}
+
+function extractBackupData() {
+    return this.location.href.split("?backupData=");
 }

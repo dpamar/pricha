@@ -32,15 +32,8 @@ var fr = {
     "importData": "Souhaitez-vous remplacer vos données par cette sauvegarde ?"
 }
 
-function getLanguage() {
-    var defaultLanguage = "fr";
-    if(cookieData.lang == null) { return defaultLanguage; }
-    if(languages.indexOf(cookieData.lang) == -1) { return defaultLanguage; }
-    return cookieData.lang;
-}
-
 function getLanguageStrings() {
-    return eval(getLanguage());
+    return eval(getLang());
 }
 
 function getStr(stringId) {
@@ -58,11 +51,5 @@ function localize() {
 
     getElement("exportBtn").innerText = getStr("exportBtn");
 
-    languages.map(lang => getElement("langBtn_" + lang).style.fontStyle = getLanguage() == lang ? "italic" : "normal");
-}
-
-function setLang(lang) {
-    cookieData.lang = lang;
-    writeCookie();
-    localize();
+    languages.map(lang => getElement("langBtn_" + lang).style.fontStyle = getLang() == lang ? "italic" : "normal");
 }

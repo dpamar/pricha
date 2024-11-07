@@ -4,7 +4,7 @@
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
         <link rel="icon" type="image/x-icon" href="favicon.png">
         <script src="hebcal.min.js"></script>
-        <script src="cookie.js"></script>
+        <script src="localStorage.js"></script>
         <script src="lang.js"></script>
         <script src="export.js"></script>
         <script src="pricha.js"></script>
@@ -33,15 +33,14 @@
         &nbsp;|&nbsp;
         <a href="#" id="exportBtn" style="font-style: normal" onclick="exportData();">Exporter les données vers un autre appareil</a>&nbsp;
         <script>
-initCookie();
-readCookie();
+importConfiguration();
 localize();
-importCookie();
+reloadSettingsButtons();
 
 lastDateSelector = getElement("lastDateSelector");
 dateSelector = getElement("dateSelector");
 
-setCalendarValue(lastDateSelector, getDateFromCookie());
+setCalendarValue(lastDateSelector, getLastDate());
 setCalendarValue(dateSelector, new Date());
         </script>
     </body>

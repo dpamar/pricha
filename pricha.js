@@ -14,7 +14,7 @@ function startNewCycleFromButton() {
 function startNewCycle(newCycleDate, lastCycleDate) {
     var dateRanges = computeDates(newCycleDate, lastCycleDate);
     setCalendarReminders(dateRanges);
-    setCookieLastDate(newCycleDate);
+    setLastDate(newCycleDate);
 }
 
 function computeDates(newDate, lastDate) {
@@ -95,7 +95,7 @@ function getDateRanges(hebrewDates, useDayPeriod) {
 }
 
 function getDateRange(hebrewDate, useDayPeriod) {
-    var orZaruach = +cookieData.orZaruach;
+    var orZaruach = isOrZaruach();
     if (useDayPeriod) {
         if(orZaruach) {
             return [hebrewDate.prev().getZemanim().shkiah, hebrewDate.getZemanim().shkiah];
@@ -169,8 +169,7 @@ function enableTestMode() {
     testMode = true;
 }
 
-function setOrZaruach(value) {
-    cookieData.orZaruach = value;
-    writeCookie();
-    reloadSettingsButtons();
+function reloadSettingsButtons() {
+    getElement("durationBtn_half").style.fontStyle = isOrZaruach() ? "normal" : "italic";
+    getElement("durationBtn_full").style.fontStyle = isOrZaruach() ? "italic" : "normal";
 }
