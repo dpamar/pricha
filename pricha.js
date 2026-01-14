@@ -113,7 +113,7 @@ function getDateRange(hebrewDate, useDayPeriod) {
 
 function setCalendarReminders(dateRanges) {
     var data = ['BEGIN:VCALENDAR','VERSION:2.0'];
-    
+
     dateRanges.map(x => {
       var startTime = x[0];
       var endTime = x[1];
@@ -130,11 +130,14 @@ function setCalendarReminders(dateRanges) {
 
     var href = encodeURI('data:text/calendar;charset=utf8,' + data.join('\n'));
 
-    getElement("new-cal").innerHTML = 
-        '<a target="_blank" href="' + href + '">' + getStr("addReminders").replace("XXX", dateRanges.length) + '</a>' + 
-        '<ul>' +
-        dateRanges.map(x => '<li>' + getStr("fromTo").replace("XXX", x[0].toLocaleString()).replace("YYY", x[1].toLocaleString()) + '</li>').join('') +
-        '<ul>';
+    var resultsDiv = getElement("new-cal");
+    resultsDiv.className = "results-section";
+    resultsDiv.innerHTML =
+        '<h2>' + getStr("addReminders") + '</h2>' +
+        '<a class="calendar-link" target="_blank" href="' + href + '">' + getStr("addReminders") + '</a>' +
+        '<ul class="date-list">' +
+        dateRanges.map(x => '<li class="date-item">' + getStr("fromTo").replace("XXX", x[0].toLocaleString()).replace("YYY", x[1].toLocaleString()) + '</li>').join('') +
+        '</ul>';
 }
 
 function getElement(id) {
@@ -170,6 +173,17 @@ function enableTestMode() {
 }
 
 function reloadSettingsButtons() {
-    getElement("durationBtn_half").style.fontStyle = isOrZaruach() ? "normal" : "italic";
-    getElement("durationBtn_full").style.fontStyle = isOrZaruach() ? "italic" : "normal";
+    // Update the duration buttons to reflect the current Or Zaruach setting
+    var halfBtn = getElement("durationBtn_half");
+    var fullBtn = getElement("durationBtn_full");
+
+    if (halfBtn && fullBtn) {
+        if (isOrZaruach()) {
+            halfBtn.className = "lang-btn";
+            fullBtn.className = "lang-btn active";
+        } else {
+            halfBtn.className = "lang-btn active";
+            fullBtn.className = "lang-btn";
+        }
+    }
 }
