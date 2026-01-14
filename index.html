@@ -1,8 +1,10 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
         <link rel="icon" type="image/x-icon" href="favicon.png">
+        <link rel="stylesheet" href="styles.css">
         <script src="hebcal.min.js"></script>
         <script src="localStorage.js"></script>
         <script src="lang.js"></script>
@@ -11,28 +13,63 @@
         <title>Calculateur</title>
     </head>
     <body>
-        <h1 id="lastCycleLabel" style="width: 100%; text-align: center;">Date du dernier cycle:</h1>
-        <p align="center">
-            <input type="datetime-local" id="lastDateSelector" name="lastDateSelector" />
-        </p>
-        <h1 id="newCycleLabel" style="width: 100%; text-align: center;">Date du nouveau cycle:</h1>
-        <p align="center">
-            <input type="datetime-local" id="dateSelector" name="dateSelector" />
-        </p>
-        <hr/>
-        <p style="width: 100%; text-align: center;">
-            <input id="newCycleButton" style="width: 200px; height: 100px;" type="button" value="Démarrer un nouveau cycle" onclick="startNewCycleFromButton();"/>
-        </p>
-        <div id="new-cal"></div>
-        <hr/>
-        <a href="#" id="langBtn_fr" style="font-style: normal" onclick="setLang('fr');">Français</a>&nbsp;
-        <a href="#" id="langBtn_en" style="font-style: normal" onclick="setLang('en');">English</a>&nbsp;
-        &nbsp;|&nbsp;
-        <a href="#" id="durationBtn_half" style="font-style: normal" onclick="setOrZaruach(0);">Demi-journées</a>&nbsp;
-        <a href="#" id="durationBtn_full" style="font-style: normal" onclick="setOrZaruach(1);">Journées complètes (Or Zaruach)</a>&nbsp;
-        &nbsp;|&nbsp;
-        <a href="#" id="exportBtn" style="font-style: normal" onclick="exportData();">Exporter les données vers un autre appareil</a>&nbsp;
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1 id="title">Calculateur</h1>
+            </div>
+
+            <!-- Date Input Section -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label" id="lastCycleLabel">Date du dernier cycle:</label>
+                    <input type="datetime-local" id="lastDateSelector" name="lastDateSelector" class="date-input" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" id="newCycleLabel">Date du nouveau cycle:</label>
+                    <input type="datetime-local" id="dateSelector" name="dateSelector" class="date-input" />
+                </div>
+
+                <div class="form-group">
+                    <button id="newCycleButton" class="btn-primary" onclick="startNewCycleFromButton();">
+                        Démarrer un nouveau cycle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="new-cal" class="results-section hidden"></div>
+
+            <!-- Settings Section -->
+            <div class="settings-section">
+                <!-- Language Selection -->
+                <div class="settings-row">
+                    <span class="settings-label">Langue / Language</span>
+                    <div class="language-toggle">
+                        <a href="#" id="langBtn_fr" class="lang-btn active" onclick="setLang('fr');">🇫🇷 FR</a>
+                        <a href="#" id="langBtn_en" class="lang-btn" onclick="setLang('en');">🇺🇸 EN</a>
+                    </div>
+                </div>
+
+                <!-- Duration Mode -->
+                <div class="settings-row">
+                    <span class="settings-label" id="durationLabel">Mode de calcul</span>
+                    <div class="language-toggle">
+                        <a href="#" id="durationBtn_half" class="lang-btn active" onclick="setOrZaruach(0);">Demi-journées</a>
+                        <a href="#" id="durationBtn_full" class="lang-btn" onclick="setOrZaruach(1);">Jours entiers (Or Zaruach)</a>
+                    </div>
+                </div>
+
+                <!-- Export Data -->
+                <a href="#" id="exportBtn" class="export-btn" onclick="exportData();">
+                    Exporter les données vers un autre appareil
+                </a>
+            </div>
+        </div>
+
         <script>
+// Initialize the app
 importConfiguration();
 localize();
 reloadSettingsButtons();
